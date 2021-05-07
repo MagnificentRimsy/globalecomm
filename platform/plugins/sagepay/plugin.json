@@ -1,0 +1,10 @@
+{
+    "name": "Sagepay Payment Gateway",
+    "namespace": "Botble\\Sagepay\\",
+    "provider": "Botble\\Sagepay\\Providers\\SagepayServiceProvider",
+    "author": "Botble Technologies",
+    "url": "https://botble.com",
+    "version": "1.0",
+    "description": "Sagepay payment gateway integration",
+    "require": []
+}

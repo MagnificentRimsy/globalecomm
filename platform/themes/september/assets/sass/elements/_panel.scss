@@ -1,0 +1,97 @@
+.panel--sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    overflow: hidden;
+    overflow-y: auto;
+    width: 400px;
+    background-color: #ffffff;
+    -webkit-transition: -webkit-transform .25s ease;
+    transition: -webkit-transform .25s ease;
+    transition: transform .25s ease;
+    transition: transform .25s ease, -webkit-transform .25s ease;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    z-index: 1000001;
+    -webkit-transform: translate3d(400px, 0, 0);
+    transform: translate3d(400px, 0, 0);
+    @extend %list-reset;
+
+    .panel__close {
+        position: absolute;
+        top: 10px;
+        right: 0;
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+
+        &:before,
+        &:after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 1px;
+            height: 50%;
+            background-color: #fff;
+            transform-origin: 50% 50%;
+            transition: all 0.4s ease;
+        }
+
+        &:before {
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+
+        &:after {
+            transform: translate(-50%, -50%) rotate(-45deg);
+        }
+
+        &:hover {
+            &:before,
+            &:after {
+                background-color: $color-danger;
+            }
+        }
+    }
+
+    .panel__header {
+        position: relative;
+        padding: 15px;
+        background-color: $color-1st;
+
+        h4 {
+            margin-bottom: 0;
+            font-weight: 500;
+            color: #fff;
+            text-transform: capitalize;
+        }
+    }
+
+    .panel__content {
+        padding: 10px;
+        margin-bottom: 0;
+        position: relative;
+        -webkit-box-flex: 1;
+        -webkit-flex: 1 1 auto;
+        flex: 1 1 auto;
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+    }
+
+    &.active {
+        -webkit-transform: none;
+        -ms-transform: none;
+        transform: none;
+    }
+
+    @media screen and (max-width: 479px) {
+        max-width: 100%;
+    }
+}

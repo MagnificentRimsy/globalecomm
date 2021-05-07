@@ -1,0 +1,238 @@
+.navigation {
+    > .container {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+.navigation--mobile {
+    display: flex;
+    padding: 10px 15px;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    @media screen and (min-width: 1200px) {
+        display: none;
+    }
+}
+
+.header {
+    display: none;
+    @extend %list-reset;
+
+    .btn-shopping-cart {
+        position: relative;
+
+        > span {
+            position: absolute;
+            top: 0;
+            right: 0;
+            transform: translate(25%, 25%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-width: 16px;
+            height: 16px;
+            background-color: $color-1st;
+            border-radius: 50%;
+            font-size: 10px;
+            color: #fff;
+        }
+    }
+
+    .header__actions {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: flex-end;
+
+        > * {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 36px;
+            height: 36px;
+
+            i {
+                font-size: 20px;
+            }
+        }
+    }
+
+    &.header--sticky {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 999;
+        padding-top: 0;
+        padding-bottom: 0;
+        background-color: #fff;
+
+        .ps-logo {
+            img {
+                max-height: 50px;
+            }
+        }
+    }
+
+    @media screen and (min-width: 1200px) {
+        display: block;
+    }
+}
+
+.header--mobile {
+    .logo {
+        font-size: 20px;
+    }
+
+    &.header--sticky {
+        //position: relative;
+        padding: 15px 20px;
+
+        .navigation--mobile {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: $color-1st;
+            box-shadow: 0 0 3px 0 rgba(#000, 0.12);
+        }
+    }
+
+    @media screen and (max-width: 1199px) {
+        display: block;
+    }
+}
+
+.navigation--list {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px 30px;
+    z-index: 100;
+    background-color: $color-1st;
+
+    .navigation__item {
+        text-align: center;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50px;
+
+        i {
+            font-size: 20px;
+            color: #ffffff;
+        }
+
+        span {
+            display: block;
+        }
+
+        &.active {
+            background-color: #fff;
+
+            i {
+                color: $color-1st;
+                font-size: 18px;
+            }
+
+            span {
+                color: $color-1st;
+            }
+        }
+    }
+
+    .navigation__content {
+        max-width: 300px;
+        margin: 0 auto;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    @media (min-width: 1200px) {
+        display: none;
+    }
+}
+
+.navigation--sticky {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: #fff;
+
+    .navigation {
+        background-color: #fff;
+    }
+
+    .header__top {
+        display: none;
+    }
+
+    &.navigation--pin {
+        @include transform(translate(0, 0));
+    }
+
+    &.navigation--unpin {
+        @include transform(translate(0, -100%));
+    }
+
+    &.header--1 {
+        &.navigation--pin {
+            .navigation {
+                background-color: rgba(#000, 0.95);
+            }
+
+            &.header--black {
+                .navigation {
+                    background-color: rgba(#fff, 0.95);
+                }
+            }
+        }
+    }
+
+    &.header--2 {
+        &.navigation--pin {
+            &.active {
+                background-color: #fff;
+                @include transform(translate(270px, 0));
+            }
+        }
+    }
+
+    @include media("<lg") {
+        &.navigation--unpin {
+            @include transform(translate(0, 0));
+        }
+    }
+}
+
+.site-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    height: 100vh;
+    background-color: rgba(#000, 0.75);
+    transition: all 0.4s ease;
+    @include hidden;
+
+    &.active {
+        @include show;
+    }
+}
+
+.ps-search--mobile {
+    max-width: 450px;
+    margin: 0 auto;
+    padding: 10px 20px;
+}

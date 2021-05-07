@@ -1,0 +1,39 @@
+.pagination {
+    .page-item {
+
+        &.active {
+            span {
+                background: $color-1st;
+                color: #fff;
+            }
+        }
+
+        .page-link {
+            border: none;
+            padding: 8px 15px;
+            margin: 0 5px;
+            background-color: #e9ecef;
+            color: $color-text;
+            outline: none;
+
+            &:hover {
+                background: $color-1st;
+                color: #fff;
+            }
+        }
+
+        &.disabled {
+            .page-link {
+                background-color: #e9ecef !important;
+            }
+        }
+    }
+}
+
+.shop__pagination {
+    text-align: center;
+    padding-top: 60px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}

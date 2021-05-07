@@ -1,0 +1,324 @@
+.section {
+    .section__header {
+        h3 {
+            font-size: 20px;
+            text-transform: uppercase;
+        }
+    }
+
+    @media screen and (min-width: 1200px) {
+        .section__header {
+            h3 {
+                font-size: 30px;
+            }
+        }
+    }
+}
+
+.section--homepage {
+    padding-top: 30px;
+
+    .section__header {
+        text-align: center;
+        padding-bottom: 40px;
+
+        h3 {
+            margin-bottom: 0.25em;
+            font-size: 30px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        p {
+            text-transform: uppercase;
+            font-size: 12px;
+            font-weight: 700;
+        }
+    }
+
+    @media screen and (min-width: 992px) {
+        padding-top: 40px;
+    }
+
+    @media screen and (min-width: 1200px) {
+        padding-top: 60px;
+    }
+}
+
+.home-collection {
+    .collection {
+        margin-bottom: 32px;
+    }
+}
+
+/* Shop*/
+
+.shop--sidebar {
+    padding-top: 30px;
+
+    .shop__header {
+        display: block;
+        height: 40px;
+        &:after {
+            clear: both;
+        }
+
+        .panel-trigger {
+            padding: 10px 30px;
+        }
+    }
+
+    .shop__left {
+        display: none;
+        @extend %list-reset;
+        margin-top: 20px;
+
+        .widget--shop {
+            margin-bottom: 20px;
+            padding: 25px 20px;
+            background-color: #f5f5f5;
+        }
+    }
+
+    .shop__sort {
+        display: none;
+
+        .form-group--inline {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-between;
+            align-items: center;
+
+            label {
+                min-width: 60px;
+                font-size: 14px;
+                font-weight: 500;
+                margin-right: 10px;
+            }
+
+            .form-control {
+                height: 40px;
+                padding: 0 30px;
+                border-radius: 50px;
+                border-color: $color-heading;
+            }
+        }
+    }
+
+    @media screen and (min-width: 992px) {
+        .shop__left {
+            padding-right: 30px;
+        }
+        .shop__header {
+            .panel-trigger {
+                display: none;
+            }
+        }
+
+        .shop__sort {
+            display: block;
+            float: right;
+        }
+    }
+
+    @media screen and (min-width: 1200px) {
+        display: flex;
+        flex-flow: row nowrap;
+        padding-top: 50px;
+
+        .shop__left {
+            max-width: 300px;
+            display: block;
+        }
+
+        .shop__content {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-between;
+            align-items: flex-start;
+
+            > * {
+                flex-basis: 100%;
+            }
+        }
+    }
+}
+
+/* Blog*/
+.section--blog {
+    padding: 30px 0;
+
+    .section__header {
+        text-align: center;
+        padding-bottom: 30px;
+
+        h1 {
+            font-size: 30px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: $color-heading;
+        }
+    }
+
+    .section__content {
+        .post {
+            margin-bottom: 30px;
+        }
+    }
+
+    .section__footer {
+        padding-top: 30px;
+    }
+
+    @media screen and (min-width: 1200px) {
+        padding: 30px 0 60px;
+        .section__header {
+            padding-bottom: 30px;
+        }
+    }
+}
+
+.section--contact-us {
+    .section__header {
+        padding: 30px 0 20px;
+        text-align: center;
+
+        h1 {
+            font-size: 30px;
+            text-transform: uppercase;
+        }
+    }
+
+    .block--contact-info {
+        margin-bottom: 20px;
+        @media screen and (min-width: 992px) {
+            margin-bottom: 40px;
+        }
+    }
+
+    @media screen and (min-width: 1200px) {
+        padding: 0 0 80px;
+    }
+}
+
+.section--related-posts {
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+
+    .post {
+        margin-bottom: 30px;
+    }
+
+    .section__header {
+        padding-bottom: 20px;
+
+        h3 {
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+    }
+
+    @media screen and (min-width: 992px) {
+        .post {
+            margin-bottom: 0;
+        }
+    }
+}
+
+/*Auth*/
+
+.section--auth {
+    .form--auth {
+        max-width: 600px;
+        margin: 0 auto 100px;
+        padding: 30px;
+        background-color: #f7f7f7;
+        .form-control, button.btn--custom.btn--outline {
+            background-color: #fff;
+        }
+    }
+}
+
+/*Account*/
+
+.section--shopping-cart {
+    .section__header {
+        text-align: center;
+        padding-bottom: 20px;
+    }
+
+    @media screen and (min-width: 992px) {
+        .section__header {
+            padding-bottom: 40px;
+        }
+    }
+}
+
+.section--account {
+    @extend %list-reset;
+
+    .list--plus {
+        li {
+            a {
+                font-size: 16px;
+            }
+
+            &.current {
+                font-size: 20px;
+            }
+        }
+    }
+
+    .section__left {
+        h3 {
+            margin-bottom: 20px;
+            position: relative;
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1em;
+            padding-bottom: 5px;
+
+            &:before {
+                content: "";
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 80px;
+                height: 2px;
+                background-color: $color-heading;
+            }
+        }
+    }
+
+    .section__right {
+        padding: 0 10px;
+    }
+
+    @media screen and (min-width: 992px) {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-between;
+        align-content: flex-start;
+        > * {
+            flex-basis: 100%;
+        }
+
+        .section__left {
+            max-width: 270px;
+        }
+        .section__right {
+        }
+    }
+}
+
+/*Others*/
+
+.section--lookbook {
+    .block--lookbook-large {
+        margin-bottom: 20px;
+        @media screen and (min-width: 992px) {
+            margin-bottom: 50px;
+        }
+    }
+}

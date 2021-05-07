@@ -1,0 +1,8 @@
+{
+    "name": "September",
+    "namespace": "Theme\\September\\",
+    "description": "Ecommerce HASA Fashion Shop",
+    "author": "Botble Technologies",
+    "version": "1.5",
+    "required_plugins": []
+}

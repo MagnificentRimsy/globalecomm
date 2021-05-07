@@ -1,0 +1,227 @@
+.table--oriented {
+    @extend %list-reset;
+
+    .table__sub-toggle {
+        position: relative;
+        display: inline-block;
+        width: 36px;
+        height: 36px;
+        cursor: pointer;
+        transform-style: preserve-3d;
+
+        &:before,
+        &:after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 12px;
+            height: 1px;
+            background-color: $color-text;
+        }
+
+        &:before {
+            transform: translateX(-50%);
+        }
+
+        &:after {
+            transform: translateX(-50%) rotate(90deg);
+        }
+
+        &.active {
+            &:after {
+                display: none;
+            }
+        }
+    }
+
+    .table__th-title {
+        font-weight: 600;
+        color: $color-heading;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .table__item {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-between;
+        margin-top: $space-md;
+        padding-top: $space-md;
+        border-top: 1px solid $color-border;
+
+        .table__label {
+            font-weight: 500;
+            line-height: 1.6em;
+        }
+    }
+
+    .table__th-inner {
+        border-bottom: 1px solid $color-border;
+        transition: all 0.4s ease;
+
+        .table__list {
+            display: none;
+        }
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        &.active {
+            .table__sub-toggle {
+                &:after {
+                    display: none;
+                }
+            }
+
+            .table__list {
+                display: block;
+            }
+        }
+    }
+
+    tbody {
+        display: none;
+    }
+
+    &.is-mobile {
+        thead {
+            tr {
+                display: flex;
+                flex-flow: column wrap;
+
+                th {
+                    width: 100%;
+                }
+
+                .table__th-empty {
+                    display: none;
+                }
+            }
+        }
+    }
+
+    @media (min-width: 768px) {
+        .table__list {
+            display: none;
+            opacity: 0;
+            transform: translate3d(1, 1, 0);
+        }
+
+        .table__sub-toggle {
+            display: none;
+        }
+
+        tbody {
+            display: table-row-group;
+        }
+    }
+}
+
+.table--cart {
+    .form-group--number {
+        max-width: 120px;
+    }
+
+    .total {
+        color: $color-text;
+        font-size: 18px;
+
+        strong {
+            color: $color-heading;
+            text-transform: uppercase;
+        }
+
+        span {
+            font-size: 0.75em;
+        }
+
+        .total__price {
+            font-size: 30px;
+            color: $color-heading;
+            font-weight: 600;
+            line-height: 1.2em;
+
+            span {
+                display: block;
+                font-size: 0.6em;
+            }
+        }
+    }
+
+    thead {
+        tr {
+            th {
+                text-transform: uppercase;
+                font-size: 12px;
+                font-weight: 600;
+                border: none;
+                border-bottom: 1px solid #e5e5e5;
+            }
+        }
+    }
+
+    tbody {
+        tr {
+            td {
+                border: none;
+                border-bottom: 1px solid #e5e5e5;
+                padding-top: 20px;
+                padding-bottom: 20px;
+                vertical-align: middle;
+
+                strong {
+                    font-weight: 600;
+                }
+
+                &:first-child {
+                    padding-left: 0;
+                }
+
+                &:last-child {
+                    padding-right: 0;
+                    text-align: right;
+
+                    button {
+                        background-color: transparent;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.table--orders {
+    .received {
+        color: #8a8a8a;
+    }
+
+    .highlight {
+        color: #078c97;
+    }
+
+    thead {
+        tr {
+            th {
+                border: none;
+            }
+        }
+    }
+
+    tbody {
+        td {
+            padding: 20px 20px;
+
+            &:first-child {
+                padding-left: 0;
+            }
+
+            &:last-child {
+                padding-right: 0;
+                text-align: right;
+            }
+        }
+    }
+}
