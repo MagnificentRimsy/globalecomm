@@ -38,14 +38,6 @@ class SagepayServiceProvider extends ServiceProvider
                 'plugins.sagepay.sagepay.connect_from_localhost' => get_payment_setting('mode', SAGEPAY_PAYMENT_METHOD_NAME) == 0,
                 'plugins.sagepay.sagepay.apiDomain' => get_payment_setting('mode', SAGEPAY_PAYMENT_METHOD_NAME) == 0 ? 'https://sandbox.sagepay.com' : 'https://securepay.sagepay.com',
             ]);
-//
-//            $config->set([
-//                'sagepay.publicKey'     => get_payment_setting('public', SAGEPAY_PAYMENT_METHOD_NAME),  // ashleyventuresa
-//                'sagepay.secretKey'     => get_payment_setting('secret', SAGEPAY_PAYMENT_METHOD_NAME), //u9lBi8kOoubDdxsHPDe380O057oOyhS4U1VlBm6Tgw1SNhp2Q9
-//                'sagepay.vendorName' => get_payment_setting('vendor_name', SAGEPAY_PAYMENT_METHOD_NAME), //zS6gqlxHfd2gfvk4NFNXIRc0FBBTTwIxQmptfXwfOHzTVjpIihktCIJZGtEjK5qks
-//                'sagepay.returnUrl' => get_payment_setting('return_url', SAGEPAY_PAYMENT_METHOD_NAME),
-//                //'sagepay.returnUrl'    => 'https://api.paystack.co',
-//            ]);
         }
     }
 }

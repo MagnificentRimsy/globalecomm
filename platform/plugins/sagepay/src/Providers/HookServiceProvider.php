@@ -4,9 +4,13 @@ namespace Botble\Sagepay\Providers;
 
 use Botble\Ecommerce\Repositories\Interfaces\OrderAddressInterface;
 use Botble\Ecommerce\Repositories\Interfaces\StoreLocatorInterface;
+use Botble\Ecommerce\Supports\OrderHelper;
 use Botble\Payment\Enums\PaymentMethodEnum;
+use Botble\Payment\Enums\PaymentStatusEnum;
+use Botble\Payment\Repositories\Interfaces\PaymentInterface;
 use Html;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\ServiceProvider;
 //use Omnipay\Omnipay;
@@ -19,10 +23,10 @@ class HookServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        add_filter(PAYMENT_FILTER_ADDITIONAL_PAYMENT_METHODS, [$this, 'registerSagepayMethod'], 19, 2);
-        add_filter(PAYMENT_FILTER_AFTER_POST_CHECKOUT, [$this, 'checkoutWithSagepay'], 19, 2);
+        add_filter(PAYMENT_FILTER_ADDITIONAL_PAYMENT_METHODS, [$this, 'registerSagepayMethod'], 41, 2);
+        add_filter(PAYMENT_FILTER_AFTER_POST_CHECKOUT, [$this, 'checkoutWithSagepay'], 41, 2);
 
-        add_filter(PAYMENT_METHODS_SETTINGS_PAGE, [$this, 'addPaymentSettings'], 100);
+        add_filter(PAYMENT_METHODS_SETTINGS_PAGE, [$this, 'addPaymentSettings'], 51);
 
         add_filter(BASE_FILTER_ENUM_ARRAY, function ($values, $class) {
             if ($class == PaymentMethodEnum::class) {
@@ -30,7 +34,7 @@ class HookServiceProvider extends ServiceProvider
             }
 
             return $values;
-        }, 34543, 2);
+        }, 60, 2);
 
         add_filter(BASE_FILTER_ENUM_LABEL, function ($value, $class) {
             if ($class == PaymentMethodEnum::class && $value == SAGEPAY_PAYMENT_METHOD_NAME) {
@@ -38,7 +42,7 @@ class HookServiceProvider extends ServiceProvider
             }
 
             return $value;
-        }, 34543, 2);
+        }, 60, 2);
 
         add_filter(BASE_FILTER_ENUM_HTML, function ($value, $class) {
             if ($class == PaymentMethodEnum::class && $value == SAGEPAY_PAYMENT_METHOD_NAME) {
@@ -48,7 +52,7 @@ class HookServiceProvider extends ServiceProvider
             }
 
             return $value;
-        }, 34543, 2);
+        }, 60, 2);
     }
 
     /**
@@ -81,118 +85,31 @@ class HookServiceProvider extends ServiceProvider
         if ($request->input('payment_method') == SAGEPAY_PAYMENT_METHOD_NAME) {
             $configure = config('plugins.sagepay.sagepay');
 
+            $expArr = explode("/",$request->input(SAGEPAY_PAYMENT_METHOD_NAME .'-exp'));
+            $nameArray = explode(" ",$request->input(SAGEPAY_PAYMENT_METHOD_NAME .'-name'));
+
             $body = [];
             $body['total_amount'] = $request->input('amount'); // You cant not pay less than 10
             $body['currency'] = $request->input('currency');
             $body['tran_id'] = uniqid(); // tran_id must be unique
+            $data['charge_id'] = $body['tran_id'];
 
             $orderAddress = $this->app->make(OrderAddressInterface::class)
                 ->getFirstBy(['order_id' => $request->input('order_id')]);
 
-            $body['cus_add2'] = '';
-            $body['cus_city'] = '';
-            $body['cus_state'] = '';
-            $body['cus_postcode'] = '';
-            $body['cus_fax'] = '';
-
-            $body['cus_name'] = 'Not set';
-            $body['cus_email'] = 'Not set';
-            $body['cus_add1'] = 'Not set';
-            $body['cus_country'] = 'Not set';
-            $body['cus_phone'] = 'Not set';
-
-            // CUSTOMER INFORMATION
-            if ($orderAddress) {
-                $body['cus_name'] = $orderAddress->name;
-                $body['cus_email'] = $orderAddress->email;
-                $body['cus_add1'] = $orderAddress->address;
-                $body['cus_country'] = $orderAddress->country_name;
-                $body['cus_phone'] = $orderAddress->phone;
-            }
-
             $primaryStore = $this->app->make(StoreLocatorInterface::class)->getFirstBy(['is_primary' => 1]);
 
-            $body['ship_name'] = 'Not set';
-            $body['ship_add1'] = 'Not set';
-            $body['ship_add2'] = 'Not set';
-            $body['ship_city'] = 'Not set';
-            $body['ship_state'] = 'Not set';
-            $body['ship_postcode'] = 'Not set';
-            $body['ship_phone'] = 'Not set';
-            $body['ship_country'] = 'Not set';
 
-            # SHIPMENT INFORMATION
-            if ($primaryStore) {
-                $body['ship_name'] = $primaryStore->name;
-                $body['ship_add1'] = $primaryStore->address;
-                $body['ship_add2'] = '';
-                $body['ship_city'] = $primaryStore->city;
-                $body['ship_state'] = $primaryStore->state;
-                $body['ship_postcode'] = '';
-                $body['ship_phone'] = $primaryStore->phone;
-                $body['ship_country'] = $primaryStore->country_name;
-            }
-
-            $body['shipping_method'] = 'NO';
-
-            $body['product_category'] = 'Goods';
-            $body['product_name'] = 'Order #' . $request->input('order_id');
-            $body['product_profile'] = 'physical-goods';
-
-            $body['value_a'] = $request->input('order_id');
-            $body['value_b'] = session('tracked_start_checkout');
-            $body['value_c'] = $request->input('customer_id');
-            $body['value_d'] = urlencode($request->input('customer_type'));
 
             $gateway = OmniPay::create('SagePay\Direct')->initialize([
                 'vendor' =>  $configure['apiCredentials']['vendor_id'],
                 'testMode' => true,
             ]);
 
-
-            $card = new CreditCard([
-                'firstName' => 'Michael',
-                'lastName' => 'Ameyaw',
-
-                'number' => '4929000000006',
-                'expiryMonth' => '12',
-                'expiryYear' => '2022',
-                'CVV' => '123',
-
-                // Billing address details are required.
-                //...
-                'billingFirstName' => 'Mike',
-                'billingLastName' => 'Ameyaw',
-                'billingAddress1' => 'Billing Address 1',
-                'billingAddress2' => 'Billing Address 2',
-                //'billingState' => 'TX',
-                'billingCity' => 'Billing City',
-                'billingPostcode' => 'BPOSTC',
-                'billingCountry' => 'GH',
-                'billingPhone' => '01234 567 890',
-                //...
-
-               'email' =>  $orderAddress ? $orderAddress->email : 'no-email@domain.com', //'michaelameyaw7@gmail.com',
-               'clientIp' => '192.168.8.102',
-
-                //...
-                'shippingFirstName' => 'Mike',
-                'shippingLastName' => 'Ameyaw',
-                'shippingAddress1' => '99',
-//                'shippingState' => 'GH',
-                'shippingCity' => 'Accra',
-                'shippingPostcode' => 'SPOSTC',
-                'shippingCountry' => 'GH',
-                'shippingPhone' => '0553771219'
-
-            ]);
-
-
-            // Create the minimal request message.
             $requestMessage = $gateway->purchase([
-                'amount' => $body['total_amount'],//(int)$request->input('amount') * 100,
+                'amount' => $body['total_amount'] * 100,//(int)$request->input('amount') * 100,
                 'currency' => $body['currency'],//'GBP',
-                'card' => $card,
+                'card' => $this->getCreditCard($request, $nameArray, $expArr, $orderAddress, $primaryStore),
                 'transactionId' => $body['tran_id'],
                 'description' => 'Pizzas for everyone at PHPNE',
 
@@ -200,148 +117,90 @@ class HookServiceProvider extends ServiceProvider
                 'returnUrl' => $configure['apiCredentials']['callback_url']
             ]);
 
-            // Send the request message.
             $responseMessage = $requestMessage->send();
 
 
             if ($responseMessage->isSuccessful()) {
                 // payment is complete
+                $status = PaymentStatusEnum::COMPLETED;
+                $this->createPaymentInterface($data, $request, $status);
+
                 header('Location: ' .  $configure['apiCredentials']['callback_url']);
                 exit;
-            } elseif ($responseMessage->isRedirect()) {
-                $responseMessage->redirect(); // this will automatically forward the customer
-            } else {
-                // not successful
-                $paymentData['error'] = true;
-
-                $paymentData['message'] = $responseMessage->getMessage();
-
-
-                //return back()->with($paymentData);
+            }
+            else {
+                $status = PaymentStatusEnum::FAILED;
+                $this->createPaymentInterface($data, $request, $status);
                 dd($responseMessage->getMessage());
             }
 
-
-//            dd($gateway);
-//            echo '<br>';
-//           dd($body);
-//           echo '<br>';
-           //dd(config('plugins.sagepay.sagepay'));
         }
 
         return $data;
     }
 
-//    /**
-//     * @param Request $request
-//     * @param array $data
-//     */
-//    public function checkoutWithSagepay(array $data, Request $request)
-//    {
-//        if ($request->input('payment_method') == SAGEPAY_PAYMENT_METHOD_NAME) {
-//            $orderAddress = $this->app->make(OrderAddressInterface::class)->getFirstBy(['order_id' => $request->input('order_id')]);
-////
-////            $this->config = config('plugins.sslcommerz.sslcommerz');
-////
-////            $this->setStoreId($this->config['apiCredentials']['store_id']);
-////            $this->setStorePassword($this->config['apiCredentials']['store_password']);
-//
-//            $gateway = OmniPay::create('SagePay\Direct')->initialize([
-//                'vendor' =>  get_payment_setting('plugins.sagepay.sagepay.apiCredentials.vendor_id', SAGEPAY_PAYMENT_METHOD_NAME),
-//                'testMode' => true,
-//            ]);
-//
-//            // Create the credit card object from details entered by the user.
-//            $transactionId = Str::random(20);
-//            $card = new CreditCard([
-//                'firstName' => 'Michael',
-//                'lastName' => 'Ameyaw',
-//
-//                'number' => '4929000000006',
-//                'expiryMonth' => '12',
-//                'expiryYear' => '2022',
-//                'CVV' => '123',
-//
-//                // Billing address details are required.
-//                //...
-//                'billingFirstName' => 'Mike',
-//                'billingLastName' => 'Ameyaw',
-//                'billingAddress1' => 'Billing Address 1',
-//                'billingAddress2' => 'Billing Address 2',
-//                //'billingState' => 'TX',
-//                'billingCity' => 'Billing City',
-//                'billingPostcode' => 'BPOSTC',
-//                'billingCountry' => 'GH',
-//                'billingPhone' => '01234 567 890',
-//                //...
-//
-//               'email' =>  $orderAddress ? $orderAddress->email : 'no-email@domain.com', //'michaelameyaw7@gmail.com',
-//               'clientIp' => '192.168.8.102',
-//
-//                //...
-//                'shippingFirstName' => 'Mike',
-//                'shippingLastName' => 'Ameyaw',
-//                'shippingAddress1' => '99',
-////                'shippingState' => 'GH',
-//                'shippingCity' => 'Accra',
-//                'shippingPostcode' => 'SPOSTC',
-//                'shippingCountry' => 'GH',
-//                'shippingPhone' => '0553771219'
-//
-//            ]);
-//
-//            // Create the minimal request message.
-//
-//            $requestMessage = $gateway->purchase([
-//                'amount' => (int)$request->input('amount') * 100,
-//                'currency' => $request->input('currency'),//'GBP',
-//                'card' => $card,
-//                'transactionId' => $transactionId,
-//                'description' => 'Pizzas for everyone at PHPNE',
-//
-//                // If 3D Secure is enabled, then provide a return URL for
-//                // when the user comes back from 3D Secure authentication.
-//
-//                'returnUrl' => get_payment_setting('plugins.sagepay.sagepay.apiCredentials.callback_url', SAGEPAY_PAYMENT_METHOD_NAME), //'https://example.co.uk/sagepay-complete',
-//            ]);
-//
-//            // Send the request message.
-//
-//            $responseMessage = $requestMessage->send();
-//
-//
-//            if ($responseMessage->isSuccessful()) {
-//                // payment is complete
-//                header('Location: ' . get_payment_setting('return_url', SAGEPAY_PAYMENT_METHOD_NAME));
-//                exit;
-//            } elseif ($responseMessage->isRedirect()) {
-//                $responseMessage->redirect(); // this will automatically forward the customer
-//            } else {
-//                // not successful
-//                dd($responseMessage->getMessage());
-//            }
-//
-//            //Sagepay::genTranxRef();
-////            $response = Sagepay::getAuthorizationResponse([
-////                'reference' => Sagepay::genTranxRef(),
-////                'quantity'  => 1,
-////                'currency'  => $request->input('currency'),
-////                'amount'    => (int)$request->input('amount') * 100,
-////                'email'     => $orderAddress ? $orderAddress->email : 'no-email@domain.com',
-////                'metadata'  => json_encode(['order_id' => $request->input('order_id')]),
-////            ]);
-////            dd($response);
-////
-////            if ($response['status']) {
-////                header('Location: ' . $response['data']['authorization_url']);
-////                exit;
-////            }
-//        }
-//
-//        return $data;
-//    }
-//
+    /**
+     * @param Request $request
+     * @param array $nameArray
+     * @param array $expArr
+     * @param $orderAddress
+     * @param $primaryStore
+     * @return CreditCard
+     */
+    private function getCreditCard(Request $request, array $nameArray, array $expArr, $orderAddress, $primaryStore)
+    {
+        $card = new CreditCard([
+            'firstName' => $nameArray[0],
+            'lastName' => $nameArray[1],
 
+            'number' => $request->input(SAGEPAY_PAYMENT_METHOD_NAME . '-number'),
+            'expiryMonth' => $expArr[0],
+            'expiryYear' => $expArr[1],
+            'CVV' => $request->input(SAGEPAY_PAYMENT_METHOD_NAME . '-cvc'),
 
+            // Billing address details are required.
+            //...
+            'billingFirstName' => $nameArray[0],
+            'billingLastName' => $nameArray[1],
+            'billingAddress1' => 'Billing Address 1',
+            'billingAddress2' => 'Billing Address 2',
+            //'billingState' => 'TX',
+            'billingCity' => 'Billing City',
+            'billingPostcode' => 'BPOSTC',
+            'billingCountry' => 'GH',
+            'billingPhone' => '01234 567 890',
+            //...
 
+            'email' => $orderAddress ? $orderAddress->email : 'no-email@domain.com', //'michaelameyaw7@gmail.com',
+            'clientIp' => '192.168.8.102',
+
+            'shippingFirstName' => $primaryStore->name,
+            'shippingLastName' => $primaryStore->name,
+            'shippingAddress1' => $primaryStore->address,
+//                'shippingState' => $primaryStore->state,
+            'shippingCity' => $primaryStore->city,
+            'shippingPostcode' => '',
+            'shippingCountry' => 'GH', //$primaryStore->country_name,
+            'shippingPhone' => $primaryStore->phone
+
+        ]);
+
+        return $card;
+    }
+
+    /**
+     * @param array $data
+     * @param Request $request
+     */
+    private function createPaymentInterface(array $data, Request $request, $status)
+    {
+        app(PaymentInterface::class)->create([
+            'amount' => $data['amount'],
+            'currency' => $data['currency'],
+            'charge_id' => $data['charge_id'],
+            'payment_channel' => SAGEPAY_PAYMENT_METHOD_NAME,
+            'status' => $status,
+            'order_id' => $request->input('order_id'),
+        ]);
+    }
 }
