@@ -18,6 +18,7 @@ class SagepayServiceProvider extends ServiceProvider
 
     /**
      * @throws FileNotFoundException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function boot()
     {

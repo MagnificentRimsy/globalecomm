@@ -25,23 +25,22 @@ class SagepayController extends BaseController
     public function getPaymentStatus(Request $request, BaseHttpResponse $response)
     {
 
+        //dd($request, $response, $request->session()->get('data'));
 //
-//        $result = Sagepay::getPaymentData();
-//        $this->storeLocalPayment([
-//            'amount'          =>  $result['data']['amount'] / 100,
-//            'currency'        => $result['data']['currency'],
-//            'charge_id'       => $request->input('reference'),
-//            'payment_channel' => SAGEPAY_PAYMENT_METHOD_NAME,
-//            'status'          => $result['status'] ? PaymentStatusEnum::COMPLETED : PaymentStatusEnum::FAILED,
-//            'customer_id'     => $request->input('customer_id'),
-//            'customer_type'   => $request->input('customer_type'),
-//            'payment_type'    => 'direct',
-//            'order_id'        => $result['data']['metadata']['order_id'],
-//        ]);
+        $result = $request->session()->get('data');
+        $this->storeLocalPayment([
+            'amount'          =>  $result['total_amount'] / 100,
+            'currency'        => $result['currency'],
+            'charge_id'       => $result['tran_id'],
+            'payment_channel' => SAGEPAY_PAYMENT_METHOD_NAME,
+            'status'          => $result['status'] ? PaymentStatusEnum::COMPLETED : PaymentStatusEnum::FAILED,
+            'customer_id'     => auth('customer')->check() ? auth('customer')->user()->getAuthIdentifier() : null,
+            'payment_type'    => 'direct',
+            'order_id'        => $result['order_id'],
+        ]);
 //
-//        OrderHelper::processOrder($result['data']['metadata']['order_id'], $request->input('reference'));
-        $result['status'] = true;
-        $result['message'] = "Payment was successful.";
+        OrderHelper::processOrder($result['order_id'], $result['tran_id']);
+
 
         if (!$result['status']) {
             return $response

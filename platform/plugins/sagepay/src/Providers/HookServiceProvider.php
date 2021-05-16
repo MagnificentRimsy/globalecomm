@@ -81,18 +81,20 @@ class HookServiceProvider extends ServiceProvider
      * @return array
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    public  function  checkoutWithSagepay(array $data, Request $request){
+    public function checkoutWithSagepay(array $data, Request $request)
+    {
         if ($request->input('payment_method') == SAGEPAY_PAYMENT_METHOD_NAME) {
             $configure = config('plugins.sagepay.sagepay');
 
-            $expArr = explode("/",$request->input(SAGEPAY_PAYMENT_METHOD_NAME .'-exp'));
-            $nameArray = explode(" ",$request->input(SAGEPAY_PAYMENT_METHOD_NAME .'-name'));
+            $expArr = explode("/", $request->input(SAGEPAY_PAYMENT_METHOD_NAME . '-exp'));
+            $nameArray = explode(" ", $request->input(SAGEPAY_PAYMENT_METHOD_NAME . '-name'));
 
             $body = [];
             $body['total_amount'] = $request->input('amount'); // You cant not pay less than 10
             $body['currency'] = $request->input('currency');
             $body['tran_id'] = uniqid(); // tran_id must be unique
             $data['charge_id'] = $body['tran_id'];
+            $body['order_id'] = $request->input('order_id');
 
             $orderAddress = $this->app->make(OrderAddressInterface::class)
                 ->getFirstBy(['order_id' => $request->input('order_id')]);
@@ -100,9 +102,8 @@ class HookServiceProvider extends ServiceProvider
             $primaryStore = $this->app->make(StoreLocatorInterface::class)->getFirstBy(['is_primary' => 1]);
 
 
-
             $gateway = OmniPay::create('SagePay\Direct')->initialize([
-                'vendor' =>  $configure['apiCredentials']['vendor_id'],
+                'vendor' => $configure['apiCredentials']['vendor_id'],
                 'testMode' => true,
             ]);
 
@@ -122,15 +123,18 @@ class HookServiceProvider extends ServiceProvider
 
             if ($responseMessage->isSuccessful()) {
                 // payment is complete
-                $status = PaymentStatusEnum::COMPLETED;
-                $this->createPaymentInterface($data, $request, $status);
+                $body['status'] = true;
+                $this->createPaymentInterface($data, $request, true);
 
-                header('Location: ' .  $configure['apiCredentials']['callback_url']);
-                exit;
-            }
-            else {
-                $status = PaymentStatusEnum::FAILED;
-                $this->createPaymentInterface($data, $request, $status);
+                $body['status'] = true;
+                $body['message'] = 'Payment was successful';
+
+                return redirect()->to($configure['apiCredentials']['callback_url'])->send()->with(['data' => $body]);
+                //header('Location: ' .  $configure['apiCredentials']['callback_url']);
+                //exit;
+            } else {
+                $body['status'] = false;
+                $this->createPaymentInterface($data, $request, false);
                 dd($responseMessage->getMessage());
             }
 
@@ -191,15 +195,16 @@ class HookServiceProvider extends ServiceProvider
     /**
      * @param array $data
      * @param Request $request
+     * @param bool $status
      */
-    private function createPaymentInterface(array $data, Request $request, $status)
+    private function createPaymentInterface(array $data, Request $request, bool $status)
     {
         app(PaymentInterface::class)->create([
             'amount' => $data['amount'],
             'currency' => $data['currency'],
             'charge_id' => $data['charge_id'],
             'payment_channel' => SAGEPAY_PAYMENT_METHOD_NAME,
-            'status' => $status,
+            'status' => $status ? PaymentStatusEnum::COMPLETED : PaymentStatusEnum::FAILED,
             'order_id' => $request->input('order_id'),
         ]);
     }
