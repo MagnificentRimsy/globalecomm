@@ -28,6 +28,19 @@ class SagepayController extends BaseController
         //dd($request, $response, $request->session()->get('data'));
 //
         $result = $request->session()->get('data');
+
+        $v = Validator::make($request->all(), [
+            'sagepay-number' => 'required|unique|max:255',
+            'sagepay-exp' => 'required|date_format:m/y|after:yesterday',
+            'sagepay-name' => 'required',
+            'sagepay-cvc' => 'required|numeric|min:3|max:3',
+        ]);
+
+        if ($v->fails())
+        {
+            return redirect()->back()->withErrors($v->errors());
+        }
+
         $this->storeLocalPayment([
             'amount'          =>  $result['total_amount'] / 100,
             'currency'        => $result['currency'],
