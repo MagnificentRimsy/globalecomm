@@ -13,7 +13,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\ServiceProvider;
-//use Omnipay\Omnipay;
 use Illuminate\Support\Str;
 use Omnipay\Common\CreditCard;
 use Omnipay\Omnipay;
@@ -85,6 +84,18 @@ class HookServiceProvider extends ServiceProvider
     {
         if ($request->input('payment_method') == SAGEPAY_PAYMENT_METHOD_NAME) {
             $configure = config('plugins.sagepay.sagepay');
+
+            $v = Validator::make($request->all(), [
+            'sagepay-number' => 'required|unique|max:255',
+            'sagepay-exp' => 'required|date_format:m/y|after:yesterday',
+            'sagepay-name' => 'required',
+            'sagepay-cvc' => 'required|numeric|min:3|max:3',
+            ]);
+
+            if ($v->fails())
+            {
+                return redirect()->back()->withErrors($v->errors());
+            }
 
             $expArr = explode("/", $request->input(SAGEPAY_PAYMENT_METHOD_NAME . '-exp'));
             $nameArray = explode(" ", $request->input(SAGEPAY_PAYMENT_METHOD_NAME . '-name'));
