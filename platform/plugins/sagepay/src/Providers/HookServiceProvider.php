@@ -101,6 +101,7 @@ class HookServiceProvider extends ServiceProvider
 
             $primaryStore = $this->app->make(StoreLocatorInterface::class)->getFirstBy(['is_primary' => 1]);
 
+            
 
             $gateway = OmniPay::create('SagePay\Direct')->initialize([
                 'vendor' => $configure['apiCredentials']['vendor_id'],
@@ -118,21 +119,23 @@ class HookServiceProvider extends ServiceProvider
                 'returnUrl' => $configure['apiCredentials']['callback_url']
             ]);
 
+             
+
             $responseMessage = $requestMessage->send();
 
 
             if ($responseMessage->isSuccessful()) {
+
                 // payment is complete
                 $body['status'] = true;
                 $this->createPaymentInterface($data, $request, true);
-
-                $body['status'] = true;
                 $body['message'] = 'Payment was successful';
 
                 return redirect()->to($configure['apiCredentials']['callback_url'])->send()->with(['data' => $body]);
                 //header('Location: ' .  $configure['apiCredentials']['callback_url']);
                 //exit;
             } else {
+                dd($responseMessage->getMessage());
                 $body['status'] = false;
                 $this->createPaymentInterface($data, $request, false);
                 dd($responseMessage->getMessage());
