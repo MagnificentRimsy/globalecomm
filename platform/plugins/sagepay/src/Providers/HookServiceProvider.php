@@ -17,6 +17,7 @@ use Illuminate\Support\Str;
 use Omnipay\Common\CreditCard;
 use Omnipay\Omnipay;
 use Throwable;
+use Illuminate\Support\Facades\Validator;
 
 class HookServiceProvider extends ServiceProvider
 {
@@ -86,7 +87,7 @@ class HookServiceProvider extends ServiceProvider
             $configure = config('plugins.sagepay.sagepay');
 
             $v = Validator::make($request->all(), [
-            'sagepay-number' => 'required|unique|max:255',
+            'sagepay-number' => 'required|max:255',
             'sagepay-exp' => 'required|date_format:m/y|after:yesterday',
             'sagepay-name' => 'required',
             'sagepay-cvc' => 'required|numeric|min:3|max:3',
@@ -94,7 +95,8 @@ class HookServiceProvider extends ServiceProvider
 
             if ($v->fails())
             {
-                return redirect()->back()->withErrors($v->errors());
+               //dd($v->errors());
+                return Redirect()->back()->with(['error' => $v->errors()]);
             }
 
             $expArr = explode("/", $request->input(SAGEPAY_PAYMENT_METHOD_NAME . '-exp'));
