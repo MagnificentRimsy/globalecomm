@@ -86,18 +86,18 @@ class HookServiceProvider extends ServiceProvider
         if ($request->input('payment_method') == SAGEPAY_PAYMENT_METHOD_NAME) {
             $configure = config('plugins.sagepay.sagepay');
 
-            $v = Validator::make($request->all(), [
-            'sagepay-number' => 'required|max:255',
-            'sagepay-exp' => 'required|date_format:m/y|after:yesterday',
-            'sagepay-name' => 'required',
-            'sagepay-cvc' => 'required|numeric|min:3|max:3',
-            ]);
+            //$v = Validator::make($request->all(), [
+            //'sagepay-exp' => 'required|date_format:m/y|after:yesterday',
+            //'sagepay-number' => 'required|max:255',
+            //'sagepay-name' => 'required',
+            //'sagepay-cvc' => 'required|numeric|min:3|max:3',
+            //]);
 
-            if ($v->fails())
-            {
+            //if ($v->fails())
+            //{
                //dd($v->errors());
-                return Redirect()->back()->with(['error' => $v->errors()]);
-            }
+                //return Redirect()->back()->with(['error' => $v->errors()]);
+            //}
 
             $expArr = explode("/", $request->input(SAGEPAY_PAYMENT_METHOD_NAME . '-exp'));
             $nameArray = explode(" ", $request->input(SAGEPAY_PAYMENT_METHOD_NAME . '-name'));
@@ -148,9 +148,11 @@ class HookServiceProvider extends ServiceProvider
                 //header('Location: ' .  $configure['apiCredentials']['callback_url']);
                 //exit;
             } else {
-                dd($responseMessage->getMessage());
-                $body['status'] = false;
-                $this->createPaymentInterface($data, $request, false);
+
+                //return redirect()->back();
+                //$body['status'] = false;
+                //$this->createPaymentInterface($data, $request, false);
+
                 dd($responseMessage->getMessage());
             }
 

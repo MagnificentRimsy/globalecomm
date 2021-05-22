@@ -74,10 +74,10 @@ var card =
 	  Card.prototype.defaults = {
 	    formatting: true,
 	    formSelectors: {
-	      numberInput: 'input[name="number"]',
-	      expiryInput: 'input[name="expiry"]',
-	      cvcInput: 'input[name="cvc"]',
-	      nameInput: 'input[name="name"]'
+            numberInput: 'input[name="sagepay-number"]',
+            expiryInput: 'input[name="sagepay-expiry"]',
+            cvcInput: 'input[name="sagepay-cvc"]',
+            nameInput: 'input[name="sagepay-name"]'
 	    },
 	    cardSelectors: {
 	      cardContainer: '.jp-card-container',

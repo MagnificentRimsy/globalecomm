@@ -22,9 +22,6 @@ class SagepayController extends BaseController
      */
     public function getPaymentStatus(Request $request, BaseHttpResponse $response)
     {
-
-        //dd($request, $response, $request->session()->get('data'));
-//
         $result = $request->session()->get('data');
         
         $this->storeLocalPayment([
@@ -37,9 +34,8 @@ class SagepayController extends BaseController
             'payment_type'    => 'direct',
             'order_id'        => $result['order_id'],
         ]);
-//
-        OrderHelper::processOrder($result['order_id'], $result['tran_id']);
 
+        OrderHelper::processOrder($result['order_id'], $result['tran_id']);
 
         if (!$result['status']) {
             return $response

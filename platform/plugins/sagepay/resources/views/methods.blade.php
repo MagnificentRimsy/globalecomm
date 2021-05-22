@@ -15,7 +15,7 @@
         </div>
         <div class="card-checkout">
             <div class="form-group">
-                <div class="stripe-card-wrapper" data-jp-card-initialized="true">
+                <div class="sagepay-card-wrapper" data-jp-card-initialized="true">
                     <div class="jp-card-container">
                         <div class="jp-card jp-card-unknown">
                             <div class="jp-card-front">
